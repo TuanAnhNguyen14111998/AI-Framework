@@ -72,6 +72,7 @@ validation_set = Dataset(df_val, labels, image_size)
 validation_generator = data.DataLoader(validation_set, **params)
 
 net = Net()
+net.cuda()
 optimizer = get_optimizer(net, lr=0.001, momentum=0.9)
 
 valid_loss_min = args["min_loss"]
