@@ -14,6 +14,7 @@ from torch.utils import data
 from tqdm import tqdm
 import numpy as np
 import csv
+import os
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -74,10 +75,12 @@ net = Net()
 optimizer = get_optimizer(net, lr=0.001, momentum=0.9)
 
 valid_loss_min = args["min_loss"]
-checkpoint_path = "./weights/current_checkpoint.pt"
-best_model_path = "./weights/best_model.pt"
 
-history_file = open("./weights/history.txt", "a")
+dir_name = os.path.dirname(os.path.abspath(__file__))
+checkpoint_path = dir_name + "/weights/current_checkpoint.pt"
+best_model_path = dir_name + "/weights/best_model.pt"
+
+history_file = open(dir_name + "/weights/history.txt", "a")
 history_file.write("epoch,val_loss,val_acc\n")
 history_file.close()
 
@@ -153,7 +156,7 @@ for epoch in range(max_epochs):
         save_ckp(checkpoint, True, checkpoint_path, best_model_path)
         valid_loss_min = val_losses
     
-    history_file = open("./weights/history.txt", "a")
+    history_file = open(dir_name + "/weights/history.txt", "a")
     history_file.write(",".join((str(epoch), str(val_losses), str(val_acc))) + "\n")
     history_file.close()
 
