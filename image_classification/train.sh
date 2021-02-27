@@ -1,0 +1,9 @@
+python train.py \
+    -i datasets \
+    -o datasets \
+    -t true \
+    -i_w 256 \
+    -i_h 256 \
+    -ep 50 \
+    -bz 1 \
+    -m_loss 1000 \

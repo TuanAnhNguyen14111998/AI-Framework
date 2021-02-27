@@ -1,0 +1,5 @@
+epoch,val_loss,val_acc
+epoch,val_loss,val_acc
+epoch,val_loss,val_acc
+epoch,val_loss,val_acc
+epoch,val_loss,val_acc
