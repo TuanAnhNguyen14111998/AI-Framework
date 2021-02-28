@@ -30,8 +30,10 @@ ap.add_argument("-ep", "--epoch", type=int, default=50,
 	help="number of epochs")
 ap.add_argument("-bz", "--batch_size", type=int, default=32,
 	help="number of epochs")
-ap.add_argument("-m_loss", "--min_loss", type=float, default=1000,
+ap.add_argument("-m_acc", "--max_accuracy", type=float, default=1000,
 	help="min val loss")
+ap.add_argument("-n_class", "--number_class", type=int, default=13,
+	help="number of class")
 ap.add_argument("-t", "--test", type=str, default="false",
 	help="option use test set")
 args = vars(ap.parse_args())
@@ -71,11 +73,11 @@ training_generator = data.DataLoader(training_set, **params)
 validation_set = Dataset(df_val, labels, image_size)
 validation_generator = data.DataLoader(validation_set, **params)
 
-net = Net()
+net = Net(n_class=args["number_class"], input_size=image_size[0])
 net.cuda()
 optimizer = get_optimizer(net, lr=0.001, momentum=0.9)
 
-valid_loss_min = args["min_loss"]
+valid_acc_max = args["max_accuracy"]
 
 dir_name = os.path.dirname(os.path.abspath(__file__))
 checkpoint_path = dir_name + "/weights/current_checkpoint.pt"
@@ -89,8 +91,9 @@ history_file.close()
 for epoch in range(max_epochs):
     # Training
     number_iter = 1
+    correct = 0
+    total = 0
     train_loss = []
-    valid_loss = []
 
     ###################
     # train the model #
@@ -107,6 +110,9 @@ for epoch in range(max_epochs):
 
             # forward + backward + optimize
             outputs = net(local_batch)
+            _, predicted = torch.max(outputs.data, 1)
+            total += local_labels.size(0)
+            correct += (predicted == local_labels).sum().item()
             loss = get_loss(outputs, local_labels)
             loss.backward()
             optimizer.step()
@@ -116,6 +122,8 @@ for epoch in range(max_epochs):
             tepoch.set_postfix(loss=loss.item())
             number_iter += 1
         train_loss = np.mean(np.array(train_loss))
+
+    train_acc = (100 * correct / total)
 
     ######################    
     # validate the model #
@@ -138,11 +146,13 @@ for epoch in range(max_epochs):
         val_losses = np.mean(np.array(val_losses))
     
     val_acc = (100 * correct / total)
-    print("Epoch {}, Validation loss {:.6f}, Accuracy {:.2f}".format(epoch, val_losses, val_acc))
+    
+    print("Epoch {}, Train Loss {:.6f}, Validate loss {:.6f}, Train Accuracy {:.2f}, Validate Accuracy {:.2f}".format(epoch, train_loss, val_losses, train_acc, val_acc))
 
     checkpoint = {
         'epoch': epoch + 1,
-        'valid_loss_min': val_losses,
+        'train_acc': train_acc,
+        'val_acc': val_acc,
         'state_dict': net.state_dict(),
         'optimizer': optimizer.state_dict(),
     }
@@ -151,11 +161,11 @@ for epoch in range(max_epochs):
     save_ckp(checkpoint, False, checkpoint_path, best_model_path)
 
     ## TODO: save the model if validation loss has decreased
-    if val_losses <= valid_loss_min:
-        print("Validation loss decreased ({:.6f} --> {:.6f}).  Saving model ...".format(valid_loss_min, val_losses))
+    if val_acc >= valid_acc_max:
+        print("Validate accuracy decreased ({:.6f} --> {:.6f}).  Saving model ...".format(valid_acc_max, val_acc))
         # save checkpoint as best model
         save_ckp(checkpoint, True, checkpoint_path, best_model_path)
-        valid_loss_min = val_losses
+        valid_acc_max = val_acc
     
     history_file = open(dir_name + "/weights/history.txt", "a")
     history_file.write(",".join((str(epoch), str(val_losses), str(val_acc))) + "\n")

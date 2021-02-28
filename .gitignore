@@ -2,3 +2,4 @@ image_classification/env/
 image_classification/datasets/*.csv
 image_classification/datasets/*.json
 image_classification/weights/*.pt
+image_classification/weights/history.txt

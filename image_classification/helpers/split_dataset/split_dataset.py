@@ -57,7 +57,6 @@ df_val = None
 df_test = None
 index = 0
 
-
 for class_name in tqdm(list_class_name):
     df_class = record_by_class_name[class_name]
     if option == "number":
@@ -65,6 +64,7 @@ for class_name in tqdm(list_class_name):
             if len(df_class) > number_train:
                 train = df_class.sample(number_train)
                 val = df_class.drop(train.index)
+                val = val.sample(number_val)
             else:
                 train, val = \
                     np.split(df_class.sample(frac=1, random_state=42), 
