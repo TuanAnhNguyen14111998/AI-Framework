@@ -1,6 +1,6 @@
 import torch.nn as nn
 import math
-
+import torch.nn.functional as F
 
 def conv_bn(inp, oup, stride):
     return nn.Sequential(
@@ -109,7 +109,7 @@ class Net(nn.Module):
         x = self.features(x)
         x = x.mean(3).mean(2)
         x = self.classifier(x)
-        return x
+        return F.log_softmax(x, dim=1)
 
     def _initialize_weights(self):
         for m in self.modules():

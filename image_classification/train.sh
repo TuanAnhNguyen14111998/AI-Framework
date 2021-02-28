@@ -7,4 +7,4 @@ python train.py \
     -ep 15 \
     -bz 1 \
     -n_class 29 \
-    -c false
+    -c true
