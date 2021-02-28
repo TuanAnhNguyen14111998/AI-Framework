@@ -101,7 +101,7 @@ class Net(nn.Module):
         self.features = nn.Sequential(*self.features)
 
         # building classifier
-        self.classifier = nn.Linear(self.last_channel, 13)
+        self.classifier = nn.Linear(self.last_channel, n_class)
 
         self._initialize_weights()
 
