@@ -11,6 +11,7 @@ import argparse
 import json
 import torch
 from torch.utils import data
+import albumentations as A
 from tqdm import tqdm
 import numpy as np
 import csv
@@ -34,6 +35,8 @@ ap.add_argument("-m_acc", "--max_accuracy", type=float, default=1000,
 	help="min val loss")
 ap.add_argument("-n_class", "--number_class", type=int, default=13,
 	help="number of class")
+ap.add_argument("-c", "--continue", type=str, default="true",
+	help="option contiue training")
 ap.add_argument("-t", "--test", type=str, default="false",
 	help="option use test set")
 args = vars(ap.parse_args())
@@ -41,6 +44,8 @@ args = vars(ap.parse_args())
 input_fordel = args["input"]
 output_fordel = args["output"]
 use_test = args["test"]
+
+dir_name = os.path.dirname(os.path.abspath(__file__))
 
 print("Starting train model classification ... ")
 
@@ -58,7 +63,7 @@ device = torch.device("cuda:0" if use_cuda else "cpu")
 
 # Parameters
 image_size = (args["image_width"], args["image_height"])
-max_epochs = args["epoch"]
+start_epoch = args["epoch"]
 
 params = {
     'batch_size': args["batch_size"],
@@ -66,8 +71,19 @@ params = {
     'num_workers': 6
 }
 
+transform = A.Compose(
+    [
+        A.SmallestMaxSize(max_size=160),
+        A.ShiftScaleRotate(shift_limit=0.05, scale_limit=0.05, rotate_limit=15, p=0.5),
+        A.RandomCrop(height=128, width=128),
+        A.RGBShift(r_shift_limit=15, g_shift_limit=15, b_shift_limit=15, p=0.5),
+        A.RandomBrightnessContrast(p=0.5),
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+    ]
+)
+
 # Generators
-training_set = Dataset(df_train, labels, image_size)
+training_set = Dataset(df_train, labels, image_size, transform)
 training_generator = data.DataLoader(training_set, **params)
 
 validation_set = Dataset(df_val, labels, image_size)
@@ -75,20 +91,24 @@ validation_generator = data.DataLoader(validation_set, **params)
 
 net = Net(n_class=args["number_class"], input_size=image_size[0])
 net.cuda()
-optimizer = get_optimizer(net, lr=0.001, momentum=0.9)
+
+if args["continue"] == "true":
+    net.load_state_dict(torch.load(dir_name + "/weights/best_model.pt"), strict=False)
+else:
+    history_file = open(dir_name + "/weights/history.txt", "a")
+    history_file.write("epoch,val_loss,val_acc\n")
+    history_file.close()
+
+train_params = [param for param in net.parameters() if param.requires_grad]
+optimizer = torch.optim.Adam(train_params, lr=0.01, betas=(0.9, 0.99))
 
 valid_acc_max = args["max_accuracy"]
 
-dir_name = os.path.dirname(os.path.abspath(__file__))
 checkpoint_path = dir_name + "/weights/current_checkpoint.pt"
 best_model_path = dir_name + "/weights/best_model.pt"
 
-history_file = open(dir_name + "/weights/history.txt", "a")
-history_file.write("epoch,val_loss,val_acc\n")
-history_file.close()
-
 # Loop over epochs
-for epoch in range(max_epochs):
+for epoch in range(start_epoch + 100):
     # Training
     number_iter = 1
     correct = 0
@@ -101,7 +121,7 @@ for epoch in range(max_epochs):
     net.train()
     with tqdm(training_generator, unit="batch") as tepoch:
         for local_batch, local_labels in tepoch:
-            tepoch.set_description("Epoch {}, interation {}".format(epoch, number_iter))
+            tepoch.set_description("Epoch {}, interation {}".format(epoch + start_epoch, number_iter))
             # Transfer to GPU
             local_batch, local_labels = local_batch.to(device), local_labels.to(device)
 
@@ -147,10 +167,10 @@ for epoch in range(max_epochs):
     
     val_acc = (100 * correct / total)
     
-    print("Epoch {}, Train Loss {:.6f}, Validate loss {:.6f}, Train Accuracy {:.2f}, Validate Accuracy {:.2f}".format(epoch, train_loss, val_losses, train_acc, val_acc))
+    print("Epoch {}, Train Loss {:.6f}, Validate loss {:.6f}, Train Accuracy {:.2f}, Validate Accuracy {:.2f}".format(epoch + start_epoch, train_loss, val_losses, train_acc, val_acc))
 
     checkpoint = {
-        'epoch': epoch + 1,
+        'epoch': epoch + start_epoch,
         'train_acc': train_acc,
         'val_acc': val_acc,
         'state_dict': net.state_dict(),

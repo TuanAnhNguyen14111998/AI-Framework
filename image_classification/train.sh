@@ -4,7 +4,8 @@ python train.py \
     -t false \
     -i_w 256 \
     -i_h 256 \
-    -ep 50 \
+    -ep 15 \
     -bz 1 \
     -m_acc 0 \
-    -n_class 13
+    -n_class 29 \
+    -c false
