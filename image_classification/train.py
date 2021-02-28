@@ -3,6 +3,7 @@ from model.loss import get_loss
 from model.optimizers import get_optimizer
 from model.data_loader import Dataset
 from helpers.save_checkpoint.save_ckp import save_ckp
+from helpers.save_checkpoint.load_ckp import load_ckp
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -31,8 +32,6 @@ ap.add_argument("-ep", "--epoch", type=int, default=50,
 	help="number of epochs")
 ap.add_argument("-bz", "--batch_size", type=int, default=32,
 	help="number of epochs")
-ap.add_argument("-m_acc", "--max_accuracy", type=float, default=1000,
-	help="min val loss")
 ap.add_argument("-n_class", "--number_class", type=int, default=13,
 	help="number of class")
 ap.add_argument("-c", "--continue", type=str, default="true",
@@ -92,17 +91,17 @@ validation_generator = data.DataLoader(validation_set, **params)
 net = Net(n_class=args["number_class"], input_size=image_size[0])
 net.cuda()
 
+train_params = [param for param in net.parameters() if param.requires_grad]
+optimizer = torch.optim.Adam(train_params, lr=0.01, betas=(0.9, 0.99))
+
+valid_acc_max = 0.0
+
 if args["continue"] == "true":
-    net.load_state_dict(torch.load(dir_name + "/weights/best_model.pt"), strict=False)
+    net, optimizer, _, valid_acc_max = load_ckp(dir_name + "/weights/best_model.pt", net, optimizer)
 else:
     history_file = open(dir_name + "/weights/history.txt", "a")
     history_file.write("epoch,val_loss,val_acc\n")
     history_file.close()
-
-train_params = [param for param in net.parameters() if param.requires_grad]
-optimizer = torch.optim.Adam(train_params, lr=0.01, betas=(0.9, 0.99))
-
-valid_acc_max = args["max_accuracy"]
 
 checkpoint_path = dir_name + "/weights/current_checkpoint.pt"
 best_model_path = dir_name + "/weights/best_model.pt"

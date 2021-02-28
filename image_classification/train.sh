@@ -6,6 +6,5 @@ python train.py \
     -i_h 256 \
     -ep 15 \
     -bz 1 \
-    -m_acc 0 \
     -n_class 29 \
     -c false
