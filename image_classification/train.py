@@ -88,7 +88,7 @@ training_generator = data.DataLoader(training_set, **params)
 validation_set = Dataset(df_val, labels, image_size)
 validation_generator = data.DataLoader(validation_set, **params)
 
-net = Net(n_class=args["number_class"], input_size=image_size[0])
+net = Net(model_name="efficientnet-b7", n_class=args["number_class"])
 net.cuda()
 
 train_params = [param for param in net.parameters() if param.requires_grad]

@@ -9,3 +9,4 @@ pillow==7.2.0
 matplotlib==3.0.3
 tensorboard==1.14.0
 albumentations==0.4.6
+efficientnet-pytorch==0.7.0

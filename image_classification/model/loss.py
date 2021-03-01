@@ -4,6 +4,6 @@ import torch.nn.functional as F
 import torch
 
 def get_loss(outputs, labels):
-    num_examples = outputs.size()[0]
+    loss = nn.CrossEntropyLoss()(outputs, labels)
     
-    return -torch.sum(outputs[range(num_examples), labels])/num_examples
+    return loss
