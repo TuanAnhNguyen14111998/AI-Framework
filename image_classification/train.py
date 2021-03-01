@@ -72,9 +72,9 @@ params = {
     'num_workers': 6
 }
 
-transform = A.Compose(
+transform_train = A.Compose(
     [
-        A.SmallestMaxSize(max_size=160),
+        # A.SmallestMaxSize(max_size=160),
         A.ShiftScaleRotate(shift_limit=0.05, scale_limit=0.05, rotate_limit=15, p=0.5),
         A.RandomCrop(height=128, width=128),
         A.RGBShift(r_shift_limit=15, g_shift_limit=15, b_shift_limit=15, p=0.5),
@@ -83,11 +83,17 @@ transform = A.Compose(
     ]
 )
 
+transform_val = A.Compose(
+    [
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+    ]
+)
+
 # Generators
-training_set = Dataset(df_train, labels, image_size, transform)
+training_set = Dataset(df_train, labels, image_size, transform_train)
 training_generator = data.DataLoader(training_set, **params)
 
-validation_set = Dataset(df_val, labels, image_size)
+validation_set = Dataset(df_val, labels, image_size, transform_val)
 validation_generator = data.DataLoader(validation_set, **params)
 
 net = Net(model_name=args["name_model"], n_class=args["number_class"])

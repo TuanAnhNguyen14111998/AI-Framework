@@ -39,7 +39,7 @@ class Dataset(data.Dataset):
             sample = self.transforms(**sample)
             image = sample["image"]
 
-        image = image / 255.
+        # image = image / 255.
         X = torch.Tensor(image).permute(2, 0, 1)
         y = self.labels[class_name]
 
