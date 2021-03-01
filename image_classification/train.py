@@ -76,7 +76,7 @@ transform_train = A.Compose(
     [
         # A.SmallestMaxSize(max_size=160),
         A.ShiftScaleRotate(shift_limit=0.05, scale_limit=0.05, rotate_limit=15, p=0.5),
-        A.RandomCrop(height=128, width=128),
+        # A.RandomCrop(height=128, width=128),
         A.RGBShift(r_shift_limit=15, g_shift_limit=15, b_shift_limit=15, p=0.5),
         A.RandomBrightnessContrast(p=0.5),
         A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
@@ -100,7 +100,7 @@ net = Net(model_name=args["name_model"], n_class=args["number_class"])
 net.cuda()
 
 train_params = [param for param in net.parameters() if param.requires_grad]
-optimizer = torch.optim.Adam(train_params, lr=0.01, betas=(0.9, 0.99))
+optimizer = torch.optim.Adam(train_params, lr=1e-4, betas=(0.9, 0.99))
 
 valid_acc_max = 0.0
 
