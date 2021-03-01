@@ -34,6 +34,8 @@ ap.add_argument("-bz", "--batch_size", type=int, default=32,
 	help="number of epochs")
 ap.add_argument("-n_class", "--number_class", type=int, default=13,
 	help="number of class")
+ap.add_argument("-n_m", "--name_model", type=str, default="efficientnet-b0",
+	help="Name model backbone")
 ap.add_argument("-c", "--continue", type=str, default="true",
 	help="option contiue training")
 ap.add_argument("-t", "--test", type=str, default="false",
@@ -88,7 +90,7 @@ training_generator = data.DataLoader(training_set, **params)
 validation_set = Dataset(df_val, labels, image_size)
 validation_generator = data.DataLoader(validation_set, **params)
 
-net = Net(model_name="efficientnet-b7", n_class=args["number_class"])
+net = Net(model_name=args["name_model"], n_class=args["number_class"])
 net.cuda()
 
 train_params = [param for param in net.parameters() if param.requires_grad]
