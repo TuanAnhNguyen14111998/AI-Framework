@@ -1,0 +1,8 @@
+train: /home/tuananh/tuananh/AI-Framework/computer_vision/image_detection/yolov5/data/custom_dataset/dataset_clean/images/train
+val: /home/tuananh/tuananh/AI-Framework/computer_vision/image_detection/yolov5/data/custom_dataset/dataset_clean/images/test
+
+# number of classes
+nc: 3
+
+# class names
+names: [ 'apple', 'banana', 'orange' ]
