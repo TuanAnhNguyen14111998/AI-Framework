@@ -1,15 +1,24 @@
-# computer vision
+##########################################################
+#                    COMPUTER VISION
+##########################################################
+
+# Task: Image classification
+
+# model: efficienet
 computer_vision/image_classification/efficienet/env/
 computer_vision/image_classification/efficienet/datasets/*.csv
 computer_vision/image_classification/efficienet/datasets/*.json
 computer_vision/image_classification/efficienet/weights/*.pt
 computer_vision/image_classification/efficienet/weights/history.txt
 
+# Task: Image detection
+
+# model: yolov5
 computer_vision/image_detection/yolov5/env/
 computer_vision/image_detection/yolov5/data/custom_dataset/dataset_clean/images/
 computer_vision/image_detection/yolov5/data/custom_dataset/dataset_clean/labels/
 computer_vision/image_detection/yolov5/data/custom_dataset/dataset_origin/train_zip/
 computer_vision/image_detection/yolov5/data/custom_dataset/dataset_origin/test_zip/
 computer_vision/image_detection/yolov5/data/custom_dataset/archive.zip
-
 computer_vision/image_detection/yolov5/yolov5s.pt
+
