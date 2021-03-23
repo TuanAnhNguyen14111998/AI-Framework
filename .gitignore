@@ -22,3 +22,8 @@ computer_vision/image_detection/yolov5/data/custom_dataset/dataset_origin/test_z
 computer_vision/image_detection/yolov5/data/custom_dataset/archive.zip
 computer_vision/image_detection/yolov5/yolov5s.pt
 
+computer_vision/crawl_image/ImageNet-Datasets-Downloader/env/
+
+computer_vision/crawl_image/OIDv4_ToolKit/env/
+computer_vision/crawl_image/OIDv4_ToolKit/OID/
+

@@ -1,0 +1,36 @@
+hat
+helmets
+scarf
+gloves
+shoe
+socks
+Pant
+boots
+high heels
+sandals
+belt
+bow tie
+shirt
+hoodie
+coat
+blazer
+hand bag
+clutch
+wallet
+yoga mat
+jewelry
+eyeglasses
+shorts
+underwear
+bikini
+jacket
+nail
+nail polish
+hair style
+beard
+watch
+lipstick
+foundation
+makeup brushes
+cosmetics
+perfume
